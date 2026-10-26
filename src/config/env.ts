@@ -8,10 +8,10 @@ const envSchema = Joi.object({
   MONGODB_URI: Joi.string().required(),
 }).unknown(true);
 
-const { error, value:envValue } = envSchema.validate((process.env, {
+const { error, value:envValue } = envSchema.validate(process.env, {
   abortEarly: false,
   convert: true
-}));
+});
 
 if (error) {
   throw new Error(`Enviroment validation failed: ${error.message}`)
