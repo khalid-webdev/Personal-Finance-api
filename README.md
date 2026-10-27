@@ -1,4 +1,3 @@
-
 # Personal Finance Transaction API
 
 A RESTful API for managing personal income, expenses, and transaction
@@ -20,12 +19,22 @@ testing, with an emphasis on relational database concepts.
 
 ## Current Status
 
-Early development — project scaffold and health-check endpoint.
+- Early development — project scaffold and health-check endpoint.
+- TypeScript project scaffold with strict mode.
+- Express application and health-check endpoint.
+- Joi environment configuration validation.
+- MongoDB connection setup.
+- User schema.
+- Transaction category schema and compound unique index
+
+Transaction CRUD, authentication, request validation, and automated
+tests are still in development.
 
 ## Planned Features
 
-- User registration and login
-- Authenticated, user-owned transactions
+-User registration and login
+-Authenticated, user-owned transactions
+
 - Income and expense transaction CRUD
 - Transaction categories
 - Filtering, sorting, and pagination
@@ -62,10 +71,10 @@ Update the environment variables as needed.
 
 ### Environment Variables
 
-| Variable | Description |
-| --- | --- |
-| PORT | HTTP server port |
-| NODE_ENV | Application environment |
+| Variable    | Description               |
+| ----------- | ------------------------- |
+| PORT        | HTTP server port          |
+| NODE_ENV    | Application environment   |
 | MONGODB_URI | MongoDB connection string |
 
 ### Development
