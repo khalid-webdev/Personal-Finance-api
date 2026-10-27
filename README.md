@@ -26,6 +26,10 @@ testing, with an emphasis on relational database concepts.
 - MongoDB connection setup.
 - User schema.
 - Transaction category schema and compound unique index
+- Transaction schema with ownership and category references
+- Integer minor-unit amount validation
+- Joi schema for transaction creation
+- Reusable Express request-validation middleware
 
 Transaction CRUD, authentication, request validation, and automated
 tests are still in development.
