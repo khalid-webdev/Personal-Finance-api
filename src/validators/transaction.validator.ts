@@ -7,7 +7,7 @@ const transactionSchema = Joi.object({
   amount: Joi.number().integer().min(1).required().max(Number.MAX_SAFE_INTEGER),
   currency: Joi.string().length(3).default("USD").uppercase(),
   description: Joi.string().trim().max(500).allow("").default(""),
-  transactionDate: Joi.date().iso().required()
+  transactionDate: Joi.date().iso()
 });
 
 

@@ -8,9 +8,9 @@ export type CreateCategoryInput = {
 };
 
 const createCategory = async (userId: Types.ObjectId, input: CreateCategoryInput) => {
-  console.log(input)
+
   const existing = await TransactionCategoryModel.findOne({userId:userId,name:input.name});
-  console.log(existing)
+
   if (existing) {
     throw new ApiError(409,"A category with this name and type already exists.")
   }
