@@ -1,5 +1,5 @@
 import {Types} from 'mongoose'
-import { TransactionCategoryModel } from '../models/Transaction-category.js';
+import { TransactionCategoryModel } from '../models/TransactionCategory.js';
 import { Transaction, TransactionModel } from '../models/Transaction.js';
 import ApiError from '../utils/ApiError.js';
 

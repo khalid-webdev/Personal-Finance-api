@@ -5,10 +5,10 @@ import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
 
 const createTransaction: RequestHandler = asyncHandler(async (req, res, next) => {
-  console.log(res.locals.id);
-  const userId: Types.ObjectId | undefined = res.locals.id;
 
-  if (!userId) {
+  const userId:Types.ObjectId | undefined= res.locals.id;
+
+  if (!(userId instanceof Types.ObjectId)) {
     throw new ApiError(401, "Authentication required!");
   }
 

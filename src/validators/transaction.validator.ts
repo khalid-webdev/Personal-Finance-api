@@ -10,6 +10,7 @@ const transactionSchema = Joi.object({
   transactionDate: Joi.date().iso().required()
 });
 
+
 export {
   transactionSchema
 }
