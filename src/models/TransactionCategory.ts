@@ -2,7 +2,7 @@ import { model, Schema, type InferSchemaType } from "mongoose";
 
 const transactionCategorySchema = new Schema({
   userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-  categoryName: { type: String, required: true, trim: true,minLength:2,maxLength:50 },
+  name: { type: String, required: true, trim: true,minLength:2,maxLength:50 },
   type: { type: String, enum: ["income", "expense"], required: true },
 }, {
   timestamps: true,
@@ -10,7 +10,7 @@ const transactionCategorySchema = new Schema({
 });
 
 transactionCategorySchema.index(
-  { userId: 1, categoryName: 1, type: 1 },
+  { userId: 1, name: 1, type: 1 },
   { unique: true }
 );
 

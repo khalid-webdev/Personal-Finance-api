@@ -22,7 +22,7 @@ const register = async (registerInput: RegisterInput) => {
   const localizeEmail = email.trim().toLowerCase();
   const existing = await UserModel.findOne({ email: localizeEmail });
   if (existing) {
-    throw new ApiError(400, "Email is already register!");
+    throw new ApiError(400, "An account with this email already exists.");
   }
   const hashedPassword = await hashPassword(password);
 

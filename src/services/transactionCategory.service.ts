@@ -3,19 +3,20 @@ import { TransactionCategoryModel } from "../models/TransactionCategory.js";
 import ApiError from "../utils/ApiError.js";
 
 export type CreateCategoryInput = {
-  categoryName: string,
+  name: string,
   type: "income" | "expense"
 };
 
 const createCategory = async (userId: Types.ObjectId, input: CreateCategoryInput) => {
-
-  const existing = await TransactionCategoryModel.findOne({ userId, categoryName: input.categoryName });
+  console.log(input)
+  const existing = await TransactionCategoryModel.findOne({userId:userId,name:input.name});
+  console.log(existing)
   if (existing) {
-    throw new ApiError(409,"Category Name is already taken")
+    throw new ApiError(409,"A category with this name and type already exists.")
   }
   const newCategory = new TransactionCategoryModel({
     userId,
-    categoryName: input.categoryName,
+    name: input.name,
     type: input.type
   });
   await newCategory.save();

@@ -5,6 +5,7 @@ import { RequestHandler } from "express";
 import ApiError from "../utils/ApiError.js";
 import { Types } from "mongoose";
 
+
 const createCategory:RequestHandler<{},unknown,CreateCategoryInput> = asyncHandler(async (req, res) => {
   const userId:Types.ObjectId | undefined= res.locals.id;
 

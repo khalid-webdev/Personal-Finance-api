@@ -18,7 +18,7 @@ app.get("/api/v1/health", (_req, res) => {
 
 app.use("/api/v1/transactions", transactionRoutes);
 app.use("/api/v1/auth", authRoutes);
-app.use("/api/v1/category", transactionCategoryRoutes);
+app.use("/api/v1/transaction-category", transactionCategoryRoutes);
 
 
 
