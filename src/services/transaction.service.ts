@@ -1,6 +1,7 @@
 import {Types} from 'mongoose'
-import { TransactionCategoryModel } from '../models/Transaction-category.model.js';
-import { Transaction, TransactionModel } from '../models/Transaction.model.js';
+import { TransactionCategoryModel } from '../models/Transaction-category.js';
+import { Transaction, TransactionModel } from '../models/Transaction.js';
+import ApiError from '../utils/ApiError.js';
 
 export type TransactionInputData = {
   categoryId: string;
@@ -17,11 +18,11 @@ const createTransaction = async (userId:Types.ObjectId,inputData:TransactionInpu
   const category = await TransactionCategoryModel.findOne({ _id: categoryId, userId });
 
   if (!category) {
-    throw new Error("Transaction category not found!");
+    throw new ApiError(404,"Transaction category not found!");
   }
 
   if (category.type !== inputData.type) {
-    throw new Error("Transaction type should match the category type!");
+    throw new ApiError(400,"Transaction type should match the category type!");
   }
 
   const newTransaction = new TransactionModel({

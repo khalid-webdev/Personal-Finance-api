@@ -5,7 +5,8 @@ import Joi from "joi";
 const envSchema = Joi.object({
   PORT: Joi.number().port().default(8000),
   NODE_ENV: Joi.string().valid("development", "production", "test").default("development"),
-  MONGODB_URI: Joi.string().uri({scheme:["mongodb","mongodb+srv"]}).required(),
+  MONGODB_URI: Joi.string().uri({ scheme: ["mongodb", "mongodb+srv"] }).required(),
+  JWT_ACCESS_SECRET: Joi.string().min(32).required(),
 }).unknown(true);
 
 const { error, value:envValue } = envSchema.validate(process.env, {
@@ -19,8 +20,11 @@ if (error) {
 
 const env = {
   port: envValue.PORT as number,
-  nodeEnv: envValue.NODE_ENV as "development" |"production"|"test",
+  nodeEnv: envValue.NODE_ENV as "development" | "production" | "test",
   mongoUri: envValue.MONGODB_URI as string,
+  jwt: {
+    accessSecret: envValue.JWT_ACCESS_SECRET as string,
+  }
 };
 
 export default env;

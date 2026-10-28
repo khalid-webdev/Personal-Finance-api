@@ -1,4 +1,7 @@
 import express,{type Express} from "express";
+import errorHandler from "./middleware/error-handler.js";
+import transactionRoutes from "./routes/transaction.routes.js";
+import authRoutes from "./routes/auth.routes.js";
 
 const app:Express = express();
 
@@ -12,6 +15,13 @@ app.get("/api/v1/health", (_req, res) => {
   });
 });
 
+app.use("/api/v1/transactions", transactionRoutes);
+app.use("/api/v1/auth", authRoutes);
+
+
+
+//at the end
+app.use(errorHandler);
 
 
 export default app;

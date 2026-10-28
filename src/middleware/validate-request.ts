@@ -8,13 +8,13 @@ const validateRequest = (schema:ObjectSchema, property:"body" | "query" | "param
       { abortEarly: false, convert: true });
 
     if (error) {
-      console.log(error, "error");
+
       res.status(400).json({
       success: false,
       message: "Request validation failed",
         error: error.details.map((detail) => {
           return {
-            field: detail.path.join("."),
+            field: detail.path.length-1 ? "No Path found":detail.path.join("."),
             message:detail.message
           }
         }),
