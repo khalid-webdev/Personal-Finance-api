@@ -39,7 +39,6 @@ const createTransaction = async (userId: Types.ObjectId, inputData: TransactionI
     throw new ApiError(400, "Transaction type should match the category type!");
   }
 
-  const transactionDate: Date = new Date(Date.now());
   const newTransaction = new TransactionModel({
     userId,
     categoryId,
@@ -47,7 +46,7 @@ const createTransaction = async (userId: Types.ObjectId, inputData: TransactionI
     amount: inputData.amount,
     currency: inputData.currency,
     description: inputData.description,
-    transactionDate,
+    transactionDate:inputData.transactionDate ? inputData.transactionDate: new Date(),
   });
 
   await newTransaction.save();
@@ -58,6 +57,8 @@ const createTransaction = async (userId: Types.ObjectId, inputData: TransactionI
 //getting all the transactions
 
 const getAllTransactions = async (userId: Types.ObjectId, inputQuery: QueryTransactionInput) => {
+
+
 
   const filter: FilterQuery<Transaction> = {
     userId: userId,
@@ -103,7 +104,7 @@ if (inputQuery.startDate !== undefined || inputQuery.endDate !== undefined) {
     TransactionModel.countDocuments(filter).exec()
   ]);
 
-  const totalPages = Math.ceil(total / inputQuery.page);
+  const totalPages = Math.ceil(total / inputQuery.limit);
 
   return {
     transactions,
@@ -112,7 +113,7 @@ if (inputQuery.startDate !== undefined || inputQuery.endDate !== undefined) {
       limit: inputQuery.limit,
       total,
       totalPages,
-      hasNextPage: inputQuery.page >totalPages,
+      hasNextPage: inputQuery.page < totalPages,
       hasPreviousPage: inputQuery.page > 1 && total > 0,
     }
   }
