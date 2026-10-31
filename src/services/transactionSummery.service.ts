@@ -1,7 +1,7 @@
 import { Types } from "mongoose"
 import { TransactionModel } from "../models/Transaction.js";
 
-type SummeryData = {
+export type SummeryData = {
   year: number;
   month: number;
   currency: string;
@@ -55,6 +55,6 @@ const getMonthlyTransactionSummery = async (userId: Types.ObjectId, input: Summe
 };
 
 
-export {
+export default{
   getMonthlyTransactionSummery
 }

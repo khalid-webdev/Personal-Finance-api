@@ -26,6 +26,9 @@ export type QueryTransactionInput = {
   sort: "newest" | "oldest";
 };
 
+
+/* ------------------------- create new transaction ------------------------- */
+
 const createTransaction = async (userId: Types.ObjectId, inputData: TransactionInputData): Promise<Transaction> => {
   const categoryId = new Types.ObjectId(inputData.categoryId);
 
@@ -54,74 +57,133 @@ const createTransaction = async (userId: Types.ObjectId, inputData: TransactionI
   return newTransaction;
 };
 
-//getting all the transactions
+/* ---------------------- getting all the transactions ---------------------- */
 
-const getAllTransactions = async (userId: Types.ObjectId, inputQuery: QueryTransactionInput) => {
-
-
+const getAllTransactions = async (userId: Types.ObjectId, inputQuery?: Partial<QueryTransactionInput>) => {
+  const query = {
+    page: 1,
+    limit: 8,
+    sort: "newest" as const,
+    ...inputQuery,
+  };
 
   const filter: FilterQuery<Transaction> = {
     userId: userId,
   };
 
-  if (inputQuery.type !== undefined) {
-    filter.type = inputQuery.type;
+  if (query.type !== undefined) {
+    filter.type = query.type;
   }
-  if (inputQuery.categoryId !== undefined) {
-    filter.categoryId = new Types.ObjectId(inputQuery.categoryId);
-  }
-
-  // if (inputQuery.startDate !== undefined || inputQuery.endDate !== undefined) {
-  //   filter.transactionDate = {
-  //     ...(inputQuery.startDate !== undefined ? { $gte: inputQuery.startDate } : {}),
-  //     ...(inputQuery.endDate !== undefined ? { $lte: inputQuery.endDate } : {}),
-  //   }
-  // }
-
-if (inputQuery.startDate !== undefined || inputQuery.endDate !== undefined) {
-  const dateFilter: {
-    $gte?: Date;
-    $lte?: Date;
-  } = {};
-
-  if (inputQuery.startDate !== undefined) {
-    dateFilter.$gte = inputQuery.startDate;
+  if (query.categoryId !== undefined) {
+    filter.categoryId = new Types.ObjectId(query.categoryId);
   }
 
-  if (inputQuery.endDate !== undefined) {
-    dateFilter.$lte = inputQuery.endDate;
+  if (query.startDate !== undefined || query.endDate !== undefined) {
+    const dateFilter: {
+      $gte?: Date;
+      $lte?: Date;
+    } = {};
+
+    if (query.startDate !== undefined) {
+      dateFilter.$gte = query.startDate;
+    }
+
+    if (query.endDate !== undefined) {
+      dateFilter.$lte = query.endDate;
+    }
+
+    filter.transactionDate = dateFilter;
   }
 
-  filter.transactionDate = dateFilter;
-}
+  const skip = (query.page - 1) * query.limit;
+  const sortDirection = query.sort === "newest" ? -1 : 1;
 
-
-  const skip = (inputQuery.page - 1) * inputQuery.limit;
-  const sortDirection = inputQuery.sort === "newest" ? -1 : 1;
-
-  const [transactions, total]=await Promise.all([
-    TransactionModel.find(filter).sort({ transactionDate: sortDirection, _id: sortDirection }).select("-userId -createdAt -updatedAt").skip(skip).limit(inputQuery.limit).lean().exec(),
+  const [transactions, total] = await Promise.all([
+    TransactionModel.find(filter)
+      .sort({ transactionDate: sortDirection, _id: sortDirection })
+      .select("-userId -createdAt -updatedAt")
+      .skip(skip)
+      .limit(query.limit)
+      .lean()
+      .exec(),
     TransactionModel.countDocuments(filter).exec()
   ]);
 
-  const totalPages = Math.ceil(total / inputQuery.limit);
+  const totalPages = Math.ceil(total / query.limit);
 
   return {
     transactions,
     pagination: {
-      page: inputQuery.page,
-      limit: inputQuery.limit,
+      page: query.page,
+      limit: query.limit,
       total,
       totalPages,
-      hasNextPage: inputQuery.page < totalPages,
-      hasPreviousPage: inputQuery.page > 1 && total > 0,
+      hasNextPage: query.page < totalPages,
+      hasPreviousPage: query.page > 1 && total > 0,
     }
   }
 
 }
 
+/* ------------------------- update the transaction ------------------------- */
+const updateTransaciton = async (userId: Types.ObjectId, transactionId: string, input: Partial<TransactionInputData>) => {
+  const transactionObjectId = new Types.ObjectId(transactionId);
 
+  const existing = await TransactionModel.findOne({ userId: userId, _id: transactionObjectId });
+
+  if (!existing) {
+    throw new ApiError(404, "Transaction not found!");
+  }
+  const nextCategoryId = input.categoryId !== undefined ? new Types.ObjectId(input.categoryId) : existing.categoryId;
+  const nextType = input.type ?? existing.type;
+
+  if (input.categoryId !== undefined || input.type !== undefined) {
+    const category = await TransactionCategoryModel.findOne({ _id: input.categoryId, userId });
+    if (!category) {
+      throw new ApiError(404, "Category not found!");
+    }
+
+    if (category.type !== nextType) {
+      throw new ApiError(400, "Transaction type must match the category type!");
+    }
+  };
+
+  if (input.categoryId !== undefined) {
+    existing.categoryId = nextCategoryId;
+  };
+  if (input.type !== undefined) {
+    existing.type = input.type;
+  };
+  if (input.amount !== undefined) {
+    existing.amount = input.amount;
+  };
+  if (input.currency !== undefined) {
+    existing.currency = input.currency;
+  };
+  if (input.description !== undefined) {
+    existing.description = input.description;
+  };
+  if (input.transactionDate !== undefined) {
+    existing.transactionDate = input.transactionDate;
+  };
+  await existing.save();
+
+  return { transaction: existing };
+
+};
+
+/* ------------------------ //delete the transaction ------------------------ */
+
+async function deleteTransaction (userId:Types.ObjectId,transactionId:string) {
+  const transaction=await TransactionModel.findOneAndDelete({ _id: transactionId, userId });
+  if (!transaction) {
+    throw new ApiError(404, "Transaction Not found!");
+  }
+  return transaction;
+}
 export default {
   createTransaction,
-  getAllTransactions
-}
+  getAllTransactions,
+  updateTransaciton,
+deleteTransaction
+};

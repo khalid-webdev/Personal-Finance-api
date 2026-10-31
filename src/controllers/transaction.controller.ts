@@ -1,8 +1,17 @@
 import { Types } from "mongoose";
-import type { RequestHandler } from "express";
-import transactionService, { QueryTransactionInput } from "../services/transaction.service.js";
+import type { RequestHandler, Response } from "express";
+import transactionService, { QueryTransactionInput, TransactionInputData } from "../services/transaction.service.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
+
+
+const userIdChecker = (userLocalsId:Types.ObjectId):Types.ObjectId => {
+const id: unknown = userLocalsId;
+  if (!(id instanceof Types.ObjectId)) {
+    throw new ApiError(401, "Authentication required!");
+  }
+  return id;
+}
 
 const createTransaction: RequestHandler = asyncHandler(async (req, res, next) => {
 
@@ -27,9 +36,11 @@ const getTransactions: RequestHandler = asyncHandler(async (_req, res, _next) =>
   if (!(userId instanceof Types.ObjectId)) {
     throw new ApiError(401, "Authentication Required")
   }
-  const query = res.locals.validateQuery as QueryTransactionInput;
+
+  const query = res.locals.validateQuery;
 
   const result = await transactionService.getAllTransactions(userId, query);
+
   return res.status(200).json({
     success: true,
     data: result.transactions,
@@ -37,7 +48,43 @@ const getTransactions: RequestHandler = asyncHandler(async (_req, res, _next) =>
   });
 });
 
+
+//? update transaction controller
+const updateTransaction = asyncHandler(async (req, res) => {
+  const userId = userIdChecker(res.locals.id);
+  const transactionId: unknown = req.params.id;
+  if (typeof transactionId !== "string") {
+    throw new ApiError(400,"Invalid Transaction Id !")
+  }
+  const inputBody = res.locals.validateBody as Partial<TransactionInputData>;
+  const transaction = await transactionService.updateTransaciton(userId, transactionId, inputBody);
+
+  return res.status(200).json({
+    success: true,
+    message: "successfully updated the transaction ",
+    data: transaction
+  });
+});
+
+
+/* --------------------------- delete transaction --------------------------- */
+const deleteTransaction =asyncHandler(async(req,res)=> {
+  const userId = userIdChecker(res.locals.id);
+
+  const transactionId: unknown = req.params.id;
+  if (typeof transactionId !== "string") {
+    throw new ApiError(400,"Invalid Transaction Id !")
+  }
+  await transactionService.deleteTransaction(userId, transactionId);
+
+  return res.status(200).json({
+    success: true,
+    message: "Transaction deleted successfully",
+  });
+})
 export {
   createTransaction,
-  getTransactions
-}
+  getTransactions,
+  updateTransaction,
+  deleteTransaction
+};

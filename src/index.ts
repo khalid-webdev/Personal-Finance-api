@@ -4,6 +4,7 @@ import transactionRoutes from "./routes/transaction.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import transactionCategoryRoutes from "./routes/transactionCategory.routes.js";
 
+
 const app:Express = express();
 
 app.use(express.json());
@@ -19,6 +20,7 @@ res.status(200).json({
 app.use("/api/v1/transactions", transactionRoutes);
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/transaction-category", transactionCategoryRoutes);
+
 
 
 

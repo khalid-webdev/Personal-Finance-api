@@ -4,8 +4,10 @@ import type {ObjectSchema} from "joi"
 type ValidationProperty = "body" | "params" | "query";
 
 const validateRequest = (schema:ObjectSchema, property:ValidationProperty = 'body'):RequestHandler => {
+
   return (req, res, next):void => {
-    const { error, value } = schema.validate(req[property],
+    const requestData = req[property] ?? {};
+    const { error, value } = schema.validate(requestData,
       { abortEarly: false, convert: true });
 
     if (error) {
@@ -21,12 +23,14 @@ const validateRequest = (schema:ObjectSchema, property:ValidationProperty = 'bod
       });
       return;
     }
+
     if (property === "body") {
+      res.locals.validateBody = value ?? {};
       req.body = value;
-    } else if(property ==="query"){
-      res.locals.validateQuery = value;
+    } else if (property === "query") {
+      res.locals.validateQuery = value ?? {};
     }else {
-      res.locals.validateParams = value;
+      res.locals.validateParams = value ?? {};
     }
     next()
   };
