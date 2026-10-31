@@ -5,8 +5,8 @@ import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
 
 
-const userIdChecker = (userLocalsId:Types.ObjectId):Types.ObjectId => {
-const id: unknown = userLocalsId;
+export const userIdChecker = (userLocalsId: Types.ObjectId): Types.ObjectId => {
+  const id: unknown = userLocalsId;
   if (!(id instanceof Types.ObjectId)) {
     throw new ApiError(401, "Authentication required!");
   }
